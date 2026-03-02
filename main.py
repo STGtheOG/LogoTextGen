@@ -2,7 +2,7 @@
 import copy
 import os
 from math import floor, ceil
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
@@ -10,20 +10,30 @@ from PIL import Image, ImageDraw
 base_image = Image.open("All_Team_Logos.png")
 blank_icon = Image.new("RGBA",(91,91), (255,255,255,0))
 blank_banner = Image.new("RGBA",(154,55), (255,255,255,0))
-print(base_image.size)
 
-IB_locations = [["Mario",2,0,0,0],
-                ["Luigi",3,0,1,0],
-                ["Peach",0,2,4,0],
-                ["Daisy",2,1,5,0],
-                ["Yoshi",2,2,6,0],
-                ["Birdo",0,0,1,1],
-                ["Wario",1,1,8,0],
-                ["Waluigi",1,0,0,1],
-                ["DonkeyKong",3,1,2,0],
-                ["DiddyKong",1,2,3,0],
-                ["Bowser",3,2,7,0],
-                ["BowserJr",0,1,0,2]]
+base_MSS = Image.open("MS_scoreboard.png")
+blank_Score = Image.new("RGBA",(64,64), (0,0,0,255))
+
+base_MST = Image.open("MS_text.png")
+dMST = ImageDraw.Draw(base_MST)
+blank_Txt = Image.new("RGBA",(32,32), (0,0,0,255))
+
+dMST.font = ImageFont.truetype(font="tahomabd.ttf", size=248)
+
+#print(base_image.size)
+MS_files = ["tex1_512x128_36f2aabb09127bd4_14","tex1_256x64_aeb43fd19b34337a_14"]
+IB_locations = [["Mario",2,0,0,0,0,0,"MF"],
+                ["Luigi",3,0,1,0,0,1,"LK"],
+                ["Peach",0,2,4,0,0,4,"PM"],
+                ["Daisy",2,1,5,0,0,5,"DF"],
+                ["Yoshi",2,2,6,0,0,6,"YE"],
+                ["Birdo",0,0,1,1,1,2,"BB"],
+                ["Wario",1,1,8,0,1,0,"WM"],
+                ["Waluigi",1,0,0,1,1,1,"WS"],
+                ["DonkeyKong",3,1,2,0,0,2,"DW"],
+                ["DiddyKong",1,2,3,0,0,3,"DM"],
+                ["Bowser",3,2,7,0,0,7,"BM"],
+                ["BowserJr",0,1,0,2,1,3,"BR"]]
 
 Stad_Info = [["tex1_256x256_0df697f8be986f07_14","Mario",96,80,16,0,""],
              ["tex1_256x256_965be7bcb78faeea_14","Luigi",128,64,16,0,""],
@@ -73,11 +83,36 @@ def edit_stad(txt,icon,size, x, y, rot, mask):
 
 
 
-def edit_base(name, ri, ci, rb, cb):
+def edit_base(name, ri, ci, rb, cb, sr, sc,txt):
     if os.path.exists("Input/" + name + ".png"):
         add_icon(Image.open("Input/"+name+".png"), ri, ci)
+        add_sc(Image.open("Input/"+name+".png"),sr,sc,txt)
     if os.path.exists("Input/"+name+"B.png"):
         add_banner(Image.open("Input/"+name+"B.png"),rb ,cb )
+
+
+def add_sc(image, row, column, txt):
+    size = 60
+    padding = (64-size)/2
+    left = 64 * column
+    right = 64 * (column+1)
+    top = 64 * row
+    bottom = 64 * (row+1)
+    adding = image.resize((size, size))
+    base_MSS.paste(blank_Score, (left,top,right, bottom))
+    base_MSS.paste(adding, (left+floor(padding), top+floor(padding), right-ceil(padding), bottom-ceil(padding)))
+    p = column + 8*row
+    c = p % 6
+    r = floor(p / 6)
+    base_MST.paste(blank_Txt,(32*c,32*r,32*(c+1),32*(r+1)))
+
+    ln = ceil(dMST.textlength(txt))+16
+    newImg = Image.new("RGBA",(ln,248),(0,0,0,255))
+    d = ImageDraw.Draw(newImg)
+    d.font = dMST.getfont()
+    d.text((16,-16),txt, fill =(255,191,0,255))
+
+    base_MST.paste(newImg.resize((32,32)), (32 * c, 32 * r, 32 * (c + 1), 32 * (r + 1)))
 
 
 def add_icon(image, row, column):
@@ -110,9 +145,11 @@ def add_banner(image, row, column):
 
 
 for v in IB_locations:
-    edit_base(v[0],v[1],v[2],v[3],v[4])
+    edit_base(v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7])
 
 base_image.save("New_Team_Logos.png")
+base_MSS.save("New_MS_Scoreboard.png")
+base_MST.save("New_MS_Text.png")
 for v in Output_files:
     base_image.save("Output/" + v + ".png")
 
