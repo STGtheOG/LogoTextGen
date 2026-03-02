@@ -1,0 +1,13 @@
+Input
+build
+dist
+*.exe
+*.zip
+
+tmp
+docs/plans
+
+.idea
+.ruff_cache
+.venv
+__pycache__

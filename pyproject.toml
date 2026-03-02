@@ -1,0 +1,14 @@
+[project]
+name = "logotextgen"
+version = "0.1.0"
+description = "An image editor for Mario Super Sluggers team logos, scoreboards, and stadium textures"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "Pillow>=10.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.18.0",
+]
